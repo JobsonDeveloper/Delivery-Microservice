@@ -1,0 +1,14 @@
+name: e-sale
+
+services:
+  delivery:
+    build: .
+    ports:
+      - "8086:8086"
+    networks:
+      - ecommerce-network
+networks:
+  ecommerce-network:
+    name: ecommerce-network
+    driver: bridge
+    external: true
