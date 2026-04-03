@@ -73,6 +73,7 @@ public class DeliveryConsumer {
                 .paymentId(paymentId)
                 .client(client)
                 .deliveryForecast(deliveryForecast)
+                .status(Status.SHIPPED)
                 .created_at(LocalDateTime.now())
                 .build();
 
