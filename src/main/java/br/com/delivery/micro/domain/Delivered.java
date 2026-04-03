@@ -14,10 +14,10 @@ import java.time.LocalDateTime;
 
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "deliveries")
-public class Deliveries {
+@NoArgsConstructor
+@Document(collection = "delivered")
+public class Delivered {
     @Id
     private String id;
     private String saleId;
@@ -31,4 +31,7 @@ public class Deliveries {
 
     @LastModifiedDate
     private LocalDateTime updated_at;
+
+    @CreatedBy
+    private LocalDateTime delivered_at;
 }
