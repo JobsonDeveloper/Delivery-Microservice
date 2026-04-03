@@ -9,6 +9,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -20,8 +21,9 @@ public class Deliveries {
     @Id
     private String id;
     private String saleId;
-    private String PaymentId;
+    private String paymentId;
     private ClientInfo client;
+    private LocalDate deliveryForecast;
 
     @CreatedBy
     private LocalDateTime created_at;
