@@ -1,8 +1,10 @@
 package br.com.delivery.micro.infra;
 
+import br.com.delivery.micro.exception.DeliveryNotFoundException;
 import br.com.delivery.micro.exception.ErrorCreatingDeliveryException;
 import br.com.delivery.micro.exception.client.ClientNotFoundException;
 import br.com.delivery.micro.exception.client.ErrorGettingClientInfoException;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -49,20 +51,32 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.badRequest().body(response);
     }
 
+    @ExceptionHandler(DataAccessException.class)
+    public ResponseEntity<?> handleDatabaseError(DataAccessException ex) {
+        return ResponseEntity
+                .status(500)
+                .body(Map.of("error", "Internal error when process delivery!"));
+    }
+
     @ExceptionHandler(ErrorGettingClientInfoException.class)
     private ResponseEntity<DefaultErrorResponse> badGatewayHandler(ErrorGettingClientInfoException exception) {
         DefaultErrorResponse defaultErrorResponse = new DefaultErrorResponse(HttpStatus.BAD_GATEWAY, exception.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(defaultErrorResponse);
     }
 
-    @ExceptionHandler(ClientNotFoundException.class)
-    private ResponseEntity<DefaultErrorResponse> notFoundHandler(ClientNotFoundException exception) {
+    @ExceptionHandler({
+            ClientNotFoundException.class,
+            DeliveryNotFoundException.class
+    })
+    private ResponseEntity<DefaultErrorResponse> notFoundHandler(RuntimeException exception) {
         DefaultErrorResponse defaultErrorResponse = new DefaultErrorResponse(HttpStatus.NOT_FOUND, exception.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(defaultErrorResponse);
     }
 
-    @ExceptionHandler(ErrorCreatingDeliveryException.class)
-    private ResponseEntity<DefaultErrorResponse> internalErrorHandler(ErrorCreatingDeliveryException exception) {
+    @ExceptionHandler({
+            ErrorCreatingDeliveryException.class
+    })
+    private ResponseEntity<DefaultErrorResponse> internalErrorHandler(RuntimeException exception) {
         DefaultErrorResponse defaultErrorResponse = new DefaultErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(defaultErrorResponse);
     }
