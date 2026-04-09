@@ -1,14 +1,14 @@
 package br.com.delivery.micro.event.consumer;
 
-import br.com.delivery.micro.domain.ClientAddress;
-import br.com.delivery.micro.domain.ClientInfo;
-import br.com.delivery.micro.domain.Deliveries;
-import br.com.delivery.micro.domain.Status;
+import br.com.delivery.micro.domain.*;
 import br.com.delivery.micro.event.dto.PaymentEventDto;
+import br.com.delivery.micro.event.dto.SaleEventDto;
 import br.com.delivery.micro.event.dto.response.ClientDto;
+import br.com.delivery.micro.exception.DeliveryNotFoundException;
 import br.com.delivery.micro.exception.ErrorCreatingDeliveryException;
 import br.com.delivery.micro.exception.client.ClientNotFoundException;
 import br.com.delivery.micro.exception.client.ErrorGettingClientInfoException;
+import br.com.delivery.micro.repository.ICanceledRepository;
 import br.com.delivery.micro.repository.IDeliveriesRepository;
 import br.com.delivery.micro.service.IClientDelivery;
 import feign.FeignException;
@@ -24,14 +24,23 @@ import java.util.concurrent.ThreadLocalRandom;
 public class DeliveryConsumer {
     private final IDeliveriesRepository iDeliveriesRepository;
     private final IClientDelivery iClientDelivery;
+    private final ICanceledRepository iCanceledRepository;
 
-    public DeliveryConsumer(IDeliveriesRepository iDeliveriesRepository, IClientDelivery iClientDelivery) {
+    public DeliveryConsumer(
+            IDeliveriesRepository iDeliveriesRepository,
+            IClientDelivery iClientDelivery,
+            ICanceledRepository iCanceledRepository
+    ) {
         this.iDeliveriesRepository = iDeliveriesRepository;
         this.iClientDelivery = iClientDelivery;
+        this.iCanceledRepository = iCanceledRepository;
     }
 
-    @KafkaListener(topics = "payment",
-            groupId = "${spring.kafka.consumer.group-id}")
+    @KafkaListener(
+            topics = "payment",
+            groupId = "${spring.kafka.consumer.group-id}",
+            containerFactory = "paymentKafkaListenerFactory"
+    )
     private void storeInDelivery(PaymentEventDto paymentEventDto) {
         Status status = paymentEventDto.status();
         String saleId = paymentEventDto.saleId();
@@ -80,5 +89,31 @@ public class DeliveryConsumer {
         Deliveries storedDelivery = iDeliveriesRepository.save(deliveries);
 
         if (storedDelivery.getId() == null) throw new ErrorCreatingDeliveryException();
+    }
+
+    @KafkaListener(
+            topics = "sale",
+            groupId = "${spring.kafka.consumer.group-id}",
+            containerFactory = "saleKafkaListenerFactory"
+    )
+    private void saleCanceledConsumer(SaleEventDto saleEventDto) {
+        Status status = saleEventDto.status();
+        String saleId = saleEventDto.id();
+
+        if (!status.equals(Status.CANCELED)) return;
+
+        Deliveries delivery = iDeliveriesRepository.findBySaleId(saleId).orElseThrow(DeliveryNotFoundException::new);
+
+        Canceled canceledDelivery = Canceled.builder()
+                .saleId(delivery.getId())
+                .paymentId(delivery.getPaymentId())
+                .client(delivery.getClient())
+                .deliveryForecast(delivery.getDeliveryForecast())
+                .status(Status.CANCELED)
+                .created_at(LocalDateTime.now())
+                .build();
+
+        iCanceledRepository.save(canceledDelivery);
+        iDeliveriesRepository.deleteById(delivery.getId());
     }
 }
