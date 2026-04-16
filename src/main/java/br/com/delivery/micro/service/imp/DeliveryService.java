@@ -21,7 +21,8 @@ public class DeliveryService implements IDeliveryService {
 
     public DeliveryService(
             IDeliveriesRepository iDeliveriesRepository,
-            IDeliveredRepository iDeliveredRepository, DeliveryProducer deliveryProducer
+            IDeliveredRepository iDeliveredRepository,
+            DeliveryProducer deliveryProducer
     ) {
         this.iDeliveriesRepository = iDeliveriesRepository;
         this.iDeliveredRepository = iDeliveredRepository;

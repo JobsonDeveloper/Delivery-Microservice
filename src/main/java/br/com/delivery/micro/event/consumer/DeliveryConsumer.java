@@ -5,7 +5,6 @@ import br.com.delivery.micro.event.dto.PaymentEventDto;
 import br.com.delivery.micro.event.dto.SaleEventDto;
 import br.com.delivery.micro.event.dto.response.ClientDto;
 import br.com.delivery.micro.exception.DeliveryNotFoundException;
-import br.com.delivery.micro.exception.ErrorCreatingDeliveryException;
 import br.com.delivery.micro.exception.client.ClientNotFoundException;
 import br.com.delivery.micro.exception.client.ErrorGettingClientInfoException;
 import br.com.delivery.micro.repository.ICanceledRepository;
@@ -15,7 +14,6 @@ import feign.FeignException;
 import feign.FeignException.FeignClientException;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.concurrent.ThreadLocalRandom;
@@ -86,9 +84,7 @@ public class DeliveryConsumer {
                 .created_at(LocalDateTime.now())
                 .build();
 
-        Deliveries storedDelivery = iDeliveriesRepository.save(deliveries);
-
-        if (storedDelivery.getId() == null) throw new ErrorCreatingDeliveryException();
+        iDeliveriesRepository.save(deliveries);
     }
 
     @KafkaListener(

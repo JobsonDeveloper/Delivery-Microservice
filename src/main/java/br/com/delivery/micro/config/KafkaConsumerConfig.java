@@ -24,10 +24,7 @@ public class KafkaConsumerConfig {
 
     @Bean
     public ConsumerFactory<String, PaymentEventDto> paymentConsumerFactory() {
-
-        JsonDeserializer<PaymentEventDto> deserializer =
-                new JsonDeserializer<>(PaymentEventDto.class);
-
+        JsonDeserializer<PaymentEventDto> deserializer = new JsonDeserializer<>(PaymentEventDto.class);
         deserializer.addTrustedPackages("*");
 
         return new DefaultKafkaConsumerFactory<>(
@@ -42,20 +39,15 @@ public class KafkaConsumerConfig {
 
     @Bean
     public ConcurrentKafkaListenerContainerFactory<String, PaymentEventDto> paymentKafkaListenerFactory() {
-
-        ConcurrentKafkaListenerContainerFactory<String, PaymentEventDto> factory =
-                new ConcurrentKafkaListenerContainerFactory<>();
-
+        ConcurrentKafkaListenerContainerFactory<String, PaymentEventDto> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(paymentConsumerFactory());
+
         return factory;
     }
 
     @Bean
     public ConsumerFactory<String, SaleEventDto> saleConsumerFactory() {
-
-        JsonDeserializer<SaleEventDto> deserializer =
-                new JsonDeserializer<>(SaleEventDto.class);
-
+        JsonDeserializer<SaleEventDto> deserializer = new JsonDeserializer<>(SaleEventDto.class);
         deserializer.addTrustedPackages("*");
 
         return new DefaultKafkaConsumerFactory<>(
@@ -70,11 +62,9 @@ public class KafkaConsumerConfig {
 
     @Bean
     public ConcurrentKafkaListenerContainerFactory<String, SaleEventDto> saleKafkaListenerFactory() {
-
-        ConcurrentKafkaListenerContainerFactory<String, SaleEventDto> factory =
-                new ConcurrentKafkaListenerContainerFactory<>();
-
+        ConcurrentKafkaListenerContainerFactory<String, SaleEventDto> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(saleConsumerFactory());
+
         return factory;
     }
 }
