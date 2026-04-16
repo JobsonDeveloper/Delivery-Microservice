@@ -5,7 +5,6 @@ import br.com.delivery.micro.event.dto.PaymentEventDto;
 import br.com.delivery.micro.event.dto.SaleEventDto;
 import br.com.delivery.micro.event.dto.response.ClientDto;
 import br.com.delivery.micro.exception.DeliveryNotFoundException;
-import br.com.delivery.micro.exception.ErrorCreatingDeliveryException;
 import br.com.delivery.micro.exception.client.ClientNotFoundException;
 import br.com.delivery.micro.exception.client.ErrorGettingClientInfoException;
 import br.com.delivery.micro.repository.ICanceledRepository;
