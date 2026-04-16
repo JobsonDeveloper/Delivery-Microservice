@@ -15,7 +15,6 @@ import feign.FeignException;
 import feign.FeignException.FeignClientException;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.concurrent.ThreadLocalRandom;
@@ -86,9 +85,7 @@ public class DeliveryConsumer {
                 .created_at(LocalDateTime.now())
                 .build();
 
-        Deliveries storedDelivery = iDeliveriesRepository.save(deliveries);
-
-        if (storedDelivery.getId() == null) throw new ErrorCreatingDeliveryException();
+        iDeliveriesRepository.save(deliveries);
     }
 
     @KafkaListener(
