@@ -3,6 +3,8 @@ package br.com.delivery.micro.controller;
 import br.com.delivery.micro.domain.Delivered;
 import br.com.delivery.micro.dto.request.MarkDeliveryAsCompletedDto;
 import br.com.delivery.micro.dto.response.ReturnDeliveryDto;
+import br.com.delivery.micro.dto.swagger.DefaultErrorResponseDto;
+import br.com.delivery.micro.dto.swagger.validation.fields.FieldsErrorDto;
 import br.com.delivery.micro.service.IDeliveryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -27,13 +29,13 @@ public class DeliveryController {
 
     @PostMapping("/api/delivery/completed")
     @Operation(
-            summary = "Mark delivery as completed",
-            description = "Mark delivery as completed and store it",
+            summary = "Finalize a delivery",
+            description = "Mark a delivery as completed",
             tags = {"Delivery"},
             responses = {
                     @ApiResponse(
                             responseCode = "201",
-                            description = "Delivery mark as completed!",
+                            description = "Delivery completed successfully",
                             content = @Content(
                                     mediaType = "application/json",
                                     schema = @Schema(implementation = ReturnDeliveryDto.class)
@@ -41,22 +43,34 @@ public class DeliveryController {
                     ),
                     @ApiResponse(
                             responseCode = "400",
-                            description = "Incompatible data!",
+                            description = "Inconsistent request fields",
                             content = @Content(
                                     mediaType = "application/json",
-                                    schema = @Schema(
-                                            example = "{ \"error\": \"Validation failed\", \"errors\": \"[...]\" }"
-                                    )
+                                    schema = @Schema(implementation = FieldsErrorDto.class)
                             )
                     ),
                     @ApiResponse(
                             responseCode = "404",
-                            description = "Delivery not found!",
+                            description = "Delivery not found",
                             content = @Content(
                                     mediaType = "application/json",
-                                    schema = @Schema(
-                                            example = "{ \"status\": \"NOT_FOUND\", \"message\": \"Delivery not found!\" }"
-                                    )
+                                    schema = @Schema(implementation = DefaultErrorResponseDto.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "500",
+                            description = "Internal Server Error",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = DefaultErrorResponseDto.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "503",
+                            description = "Service Unavailable",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = DefaultErrorResponseDto.class)
                             )
                     )
             }
@@ -66,7 +80,7 @@ public class DeliveryController {
         Delivered delivered = iDeliveryService.markAsDelivered(deliveryId);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(new ReturnDeliveryDto(
-                "Delivery mark as completed!",
+                "Delivery completed successfully!",
                 delivered
         ));
     }
