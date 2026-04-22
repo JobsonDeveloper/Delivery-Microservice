@@ -5,7 +5,7 @@
 Microservice focused on the creation and management of deliveries.
 This project is one of five microservices that make up an e-commerce system.
 
-Client Microservice: https://github.com/JobsonDeveloper/Client-Microservice
+User Microservice: https://github.com/JobsonDeveloper/User-Microservice
 
 Product Microservice: https://github.com/JobsonDeveloper/Product-Microservice
 
