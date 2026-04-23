@@ -39,7 +39,7 @@ public class DeliveryService implements IDeliveryService {
         Delivered delivered = Delivered.builder()
                 .saleId(delivery.getSaleId())
                 .paymentId(delivery.getPaymentId())
-                .client(delivery.getClient())
+                .user(delivery.getUser())
                 .deliveryForecast(delivery.getDeliveryForecast())
                 .status(Status.DELIVERED)
                 .created_at(delivery.getCreated_at())
@@ -52,7 +52,7 @@ public class DeliveryService implements IDeliveryService {
         deliveryProducer.createEvent(new DeliveryProducerDto(
                 deliveredInfo.getId(),
                 delivered.getSaleId(),
-                delivered.getClient().getId(),
+                delivered.getUser().getId(),
                 delivered.getStatus()
         ));
 

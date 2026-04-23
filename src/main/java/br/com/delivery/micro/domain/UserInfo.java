@@ -5,10 +5,10 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class ClientInfo {
+public class UserInfo {
     private String id;
     private String firstName;
     private String lastName;
     private String cpf;
-    private ClientAddress address;
+    private UserAddress address;
 }

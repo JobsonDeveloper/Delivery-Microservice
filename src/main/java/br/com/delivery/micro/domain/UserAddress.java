@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class ClientAddress {
+public class UserAddress {
     private String cep;
     private String number;
     private String complement;
