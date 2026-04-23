@@ -28,7 +28,7 @@ public class Delivered {
     @Indexed(unique = true)
     private String paymentId;
 
-    private ClientInfo client;
+    private UserInfo user;
     private LocalDate deliveryForecast;
     private Status status;
 

@@ -3,7 +3,7 @@ server.port=
 spring.application.zone=America/Recife
 
 #Microservices
-client.micro.url=
+user.micro.url=
 
 #Database
 MONGO_HOST=

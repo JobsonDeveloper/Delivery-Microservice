@@ -1,8 +1,8 @@
 package br.com.delivery.micro.infra;
 
 import br.com.delivery.micro.exception.DeliveryNotFoundException;
-import br.com.delivery.micro.exception.client.ClientNotFoundException;
-import br.com.delivery.micro.exception.client.ErrorGettingClientInfoException;
+import br.com.delivery.micro.exception.user.UserNotFoundException;
+import br.com.delivery.micro.exception.user.ErrorGettingUserInfoException;
 import com.mongodb.DuplicateKeyException;
 import com.mongodb.MongoException;
 import org.springframework.dao.DataAccessException;
@@ -58,7 +58,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler({
-            ClientNotFoundException.class,
+            UserNotFoundException.class,
             DeliveryNotFoundException.class
     })
     private ResponseEntity<DefaultErrorResponse> notFoundHandler(RuntimeException exception) {
@@ -68,7 +68,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         );
     }
 
-    @ExceptionHandler(ErrorGettingClientInfoException.class)
+    @ExceptionHandler(ErrorGettingUserInfoException.class)
     private ResponseEntity<DefaultErrorResponse> errorGetInfoHandler(RuntimeException exception) {
         return this.responseConstructor(
                 HttpStatus.BAD_GATEWAY,

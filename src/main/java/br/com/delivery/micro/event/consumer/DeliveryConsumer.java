@@ -3,13 +3,13 @@ package br.com.delivery.micro.event.consumer;
 import br.com.delivery.micro.domain.*;
 import br.com.delivery.micro.event.dto.PaymentEventDto;
 import br.com.delivery.micro.event.dto.SaleEventDto;
-import br.com.delivery.micro.event.dto.response.ClientDto;
+import br.com.delivery.micro.event.dto.response.UserDto;
 import br.com.delivery.micro.exception.DeliveryNotFoundException;
-import br.com.delivery.micro.exception.client.ClientNotFoundException;
-import br.com.delivery.micro.exception.client.ErrorGettingClientInfoException;
+import br.com.delivery.micro.exception.user.UserNotFoundException;
+import br.com.delivery.micro.exception.user.ErrorGettingUserInfoException;
 import br.com.delivery.micro.repository.ICanceledRepository;
 import br.com.delivery.micro.repository.IDeliveriesRepository;
-import br.com.delivery.micro.service.IClientDelivery;
+import br.com.delivery.micro.service.IUserDelivery;
 import feign.FeignException;
 import feign.FeignException.FeignClientException;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -21,16 +21,16 @@ import java.util.concurrent.ThreadLocalRandom;
 @Service
 public class DeliveryConsumer {
     private final IDeliveriesRepository iDeliveriesRepository;
-    private final IClientDelivery iClientDelivery;
+    private final IUserDelivery iUserDelivery;
     private final ICanceledRepository iCanceledRepository;
 
     public DeliveryConsumer(
             IDeliveriesRepository iDeliveriesRepository,
-            IClientDelivery iClientDelivery,
+            IUserDelivery iUserDelivery,
             ICanceledRepository iCanceledRepository
     ) {
         this.iDeliveriesRepository = iDeliveriesRepository;
-        this.iClientDelivery = iClientDelivery;
+        this.iUserDelivery = iUserDelivery;
         this.iCanceledRepository = iCanceledRepository;
     }
 
@@ -43,33 +43,33 @@ public class DeliveryConsumer {
         Status status = paymentEventDto.status();
         String saleId = paymentEventDto.saleId();
         String paymentId = paymentEventDto.paymentId();
-        String clientId = paymentEventDto.clientId();
+        String userId = paymentEventDto.userId();
         LocalDate date = LocalDate.now();
         int randomRange = ThreadLocalRandom.current().nextInt(0, 21);
 
         if (!status.equals(Status.PAID)) return;
 
-        ClientDto clientResponse = null;
+        UserDto userResponse = null;
 
         try {
-            clientResponse = iClientDelivery.getClientInfo(clientId).client();
+            userResponse = iUserDelivery.getUserInfo(userId).user();
         } catch (FeignException.NotFound e) {
-            throw new ClientNotFoundException();
+            throw new UserNotFoundException();
         } catch (FeignClientException e) {
-            throw new ErrorGettingClientInfoException();
+            throw new ErrorGettingUserInfoException();
         }
 
-        ClientAddress address = ClientAddress.builder()
-                .cep(clientResponse.address().getCep())
-                .number(clientResponse.address().getNumber())
-                .complement(clientResponse.address().getComplement())
+        UserAddress address = UserAddress.builder()
+                .cep(userResponse.address().getCep())
+                .number(userResponse.address().getNumber())
+                .complement(userResponse.address().getComplement())
                 .build();
 
-        ClientInfo client = ClientInfo.builder()
-                .id(clientResponse.id())
-                .firstName(clientResponse.firstName())
-                .lastName(clientResponse.lastName())
-                .cpf(clientResponse.cpf())
+        UserInfo user = UserInfo.builder()
+                .id(userResponse.id())
+                .firstName(userResponse.firstName())
+                .lastName(userResponse.lastName())
+                .cpf(userResponse.cpf())
                 .address(address)
                 .build();
 
@@ -78,7 +78,7 @@ public class DeliveryConsumer {
         Deliveries deliveries = Deliveries.builder()
                 .saleId(saleId)
                 .paymentId(paymentId)
-                .client(client)
+                .user(user)
                 .deliveryForecast(deliveryForecast)
                 .status(Status.SHIPPED)
                 .created_at(LocalDateTime.now())
@@ -103,7 +103,7 @@ public class DeliveryConsumer {
         Canceled canceledDelivery = Canceled.builder()
                 .saleId(delivery.getId())
                 .paymentId(delivery.getPaymentId())
-                .client(delivery.getClient())
+                .user(delivery.getUser())
                 .deliveryForecast(delivery.getDeliveryForecast())
                 .status(Status.CANCELED)
                 .created_at(LocalDateTime.now())

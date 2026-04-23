@@ -5,7 +5,7 @@ import br.com.delivery.micro.domain.Status;
 public record DeliveryProducerDto(
         String id,
         String saleId,
-        String clientId,
+        String userId,
         Status status
 ) {
 }
